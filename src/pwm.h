@@ -1,0 +1,23 @@
+#include "pwm.h"
+
+void PWM_TM3_Init(void) {
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+    GPIOA->CRL &= ~(GPIO_CRL_MODE6 | GPIO_CRL_CNF6);
+    GPIOA->CRL |= GPIO_CRL_MODE6_1 | GPIO_CRL_MODE6_0;
+    GPIOA->CRL |= GPIO_CRL_CNF6_1;
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+    TIM3->PSC = 72 - 1;
+    TIM3->ARR = 1000 - 1;
+    TIM3->CCMR1 &= ~TIM_CCMR1_OC1M;
+    TIM3->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2;
+    TIM3->CCMR1 |= TIM_CCMR1_OC1PE;
+    TIM3->CCER |= TIM_CCER_CC1E;
+    TIM3->CCER &= ~TIM_CCER_CC1P;
+    TIM3->CR1 |= TIM_CR1_CEN;
+    TIM3->CCR1 = 500;
+}
+
+void PWM_SetDuty(uint16_t duty) {
+    if (duty > 1000) duty = 1000;
+    TIM3->CCR1 = duty;
+}
